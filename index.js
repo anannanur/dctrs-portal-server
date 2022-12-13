@@ -43,9 +43,7 @@ async function run() {
             res.send(services)
         })
 
-        app.get('/hello', async(req,res) =>{
-            res.send('hello')
-        })
+        
 
         app.get('/booking', verifyJWT, async (req, res) => {
             const patient = req.query.patient;
@@ -161,6 +159,9 @@ run().catch(console.dir);
 
 app.get('/', (req, res) => {
     res.send('Hello from Doctor Uncle!')
+})
+app.get('/hello', async(req,res) =>{
+    res.send('hello')
 })
 
 app.listen(port, () => {
