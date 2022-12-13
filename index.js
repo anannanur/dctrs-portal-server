@@ -29,7 +29,7 @@ function verifyJWT(req, res, next) {
 
 }
 
-async function run() {
+// async function run() {
     // try {
         await client.connect()
         const serviceCollection = client.db("dctrs_portal").collection("services")
@@ -154,8 +154,8 @@ async function run() {
     // } finally {
 
     // }
-}
-run().catch(console.dir);
+// }
+// run().catch(console.dir);
 
 app.get('/', (req, res) => {
     res.send('Hello from Doctor Uncle!')
