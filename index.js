@@ -41,7 +41,7 @@ function verifyJWT(req, res, next) {
             const query = {}
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
-            res.send(services)
+            res.status(200).send(services)
         })
 
         
