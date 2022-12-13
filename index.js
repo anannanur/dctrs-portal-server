@@ -30,7 +30,7 @@ function verifyJWT(req, res, next) {
 }
 
 async function run() {
-    try {
+    // try {
         await client.connect()
         const serviceCollection = client.db("dctrs_portal").collection("services")
         const bookingCollection = client.db('dctrs_portal').collection('bookings')
@@ -151,9 +151,9 @@ async function run() {
          * app.delete('/booking/:id) //
         */
 
-    } finally {
+    // } finally {
 
-    }
+    // }
 }
 run().catch(console.dir);
 
