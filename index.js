@@ -43,6 +43,10 @@ async function run() {
             res.send(services)
         })
 
+        app.get('/hello', async(req,res) =>{
+            res.send('hello')
+        })
+
         app.get('/booking', verifyJWT, async (req, res) => {
             const patient = req.query.patient;
             const authorization = req.headers.authorization;
