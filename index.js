@@ -29,10 +29,10 @@ function verifyJWT(req, res, next) {
 
 }
 
-// async function run() {
-    // try {
+async function run() {
+    try {
         client.connect()
-        .then(res => console.log(res))
+            .then(res => console.log(res))
         const serviceCollection = client.db("dctrs_portal").collection("services")
         const bookingCollection = client.db('dctrs_portal').collection('bookings')
         const userCollection = client.db('dctrs_portal').collection('users')
@@ -44,7 +44,7 @@ function verifyJWT(req, res, next) {
             res.status(200).send(services)
         })
 
-        
+
 
         app.get('/booking', verifyJWT, async (req, res) => {
             const patient = req.query.patient;
@@ -152,16 +152,17 @@ function verifyJWT(req, res, next) {
          * app.delete('/booking/:id) //
         */
 
-    // } finally {
+    } finally {
 
-    // }
-// }
-// run().catch(console.dir);
+    }
 
+}
+
+run().catch(console.dir);
 app.get('/', (req, res) => {
-    res.send('Hello from Doctor Uncle!')
+    res.status(200).send('Hello from Doctor Uncle!')
 })
-app.get('/hello', async(req,res) =>{
+app.get('/hello', async (req, res) => {
     res.send('hello')
 })
 
