@@ -31,15 +31,27 @@ function verifyJWT(req, res, next) {
 
 async function run() {
     try {
-        client.connect()
-            .then(res => console.log(res))
+        await client.connect();
         const serviceCollection = client.db("dctrs_portal").collection("services")
         const bookingCollection = client.db('dctrs_portal').collection('bookings')
         const userCollection = client.db('dctrs_portal').collection('users')
+        const doctorCollection = client.db('dctrs_portal').collection('doctors')
+
+
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email
+            const requesterAccount = await userCollection.findOne({ email: requester })
+            if (requesterAccount.role === 'admin') {
+                next()
+            }
+            else {
+                return res.status(403).send({ message: 'Forbidded' })
+            }
+        }
 
         app.get('/services', async (req, res) => {
             const query = {}
-            const cursor = serviceCollection.find(query);
+            const cursor = serviceCollection.find(query).project({ name: 1 });
             const services = await cursor.toArray();
             res.status(200).send(services)
         })
@@ -83,22 +95,14 @@ async function run() {
             const result = await bookingCollection.insertOne(booking)
             return res.send({ success: true, result })
         })
-        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+        app.put('/user/admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
             const email = req.params.email
-            const requester = req.decoded.email
-            const requesterAccount = await userCollection.findOne({ email: requester })
-            if (requesterAccount.role === 'admin') {
-                const filter = { email: email }
-                const updateDoc = {
-                    $set: { role: 'admin' }
-                }
-                const result = await userCollection.updateOne(filter, updateDoc)
-                return res.send(result)
+            const filter = { email: email }
+            const updateDoc = {
+                $set: { role: 'admin' }
             }
-            else {
-                return res.status(403).send({ message: 'Forbidded' })
-            }
-
+            const result = await userCollection.updateOne(filter, updateDoc)
+            return res.send(result)
         })
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email
@@ -111,6 +115,12 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, options)
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
             res.send({ result, token })
+        })
+
+        app.post('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
+            const doctor = req.body
+            const result = await doctorCollection.insertOne(doctor)
+            res.send(result)
         })
 
         // Warning: This is not the proper way to query multiple collection. 
@@ -159,11 +169,9 @@ async function run() {
 }
 
 run().catch(console.dir);
+
 app.get('/', (req, res) => {
     res.status(200).send('Hello from Doctor Uncle!')
-})
-app.get('/hello', async (req, res) => {
-    res.send('hello')
 })
 
 app.listen(port, () => {
